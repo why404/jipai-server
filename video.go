@@ -89,6 +89,13 @@ func (v *Videos) Get(id string) (*Video, error) {
 }
 
 func (v *Videos) Delete(id string) error {
+	video, err := v.Get(id)
+	if err != nil {
+		return err
+	}
+	if _, err := v.stream.Delete(video.StreamId); err != nil {
+		return Error{http.StatusInternalServerError, err.Error(), 500001}
+	}
 	if err := v.collection.RemoveId(bson.ObjectIdHex(id)); err != nil {
 		if err == mgo.ErrNotFound {
 			return Error{http.StatusNotFound, "not found", 401001}

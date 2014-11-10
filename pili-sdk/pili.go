@@ -102,3 +102,22 @@ func (s *Streams) Get(id string) (*Stream, error) {
 
 	return &ret, nil
 }
+
+func (s *Streams) Delete(id string) (*Stream, error) {
+	req, err := s.mac.newRequest("DELETE", "/streams/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var ret Stream
+	if err := handleResp(resp, &ret); err != nil {
+		return nil, err
+	}
+
+	return &ret, nil
+}

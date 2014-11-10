@@ -47,7 +47,7 @@ func main() {
 		}
 	})
 
-	router.GET("/player/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	router.GET("/live/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		id := p.ByName("id")
 		video, err := videos.Get(id)
 		if err != nil {
