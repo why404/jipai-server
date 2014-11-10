@@ -30,7 +30,7 @@
     <![endif]-->
 
     <div class="container" id="content">
-      <h2 class="page-header text-center">{{ .Video.Name }} <br/><small>{{ .Video.CreatedAt.Year }}年{{ .Video.CreatedAt.Month }}月{{ .Video.CreatedAt.Day }}日</small> </h2>
+      <h2 class="page-header text-center">{{ .Video.Name }} <br/><small>{{ .Video.CreatedAt.Year }}年{{ printf "%d" .Video.CreatedAt.Month }}月{{ .Video.CreatedAt.Day }}日</small> </h2>
       <div id="player-wrap">
         <video id="video" class="video-js vjs-default-skin" controls preload="none" width="100%" height="100%">
           <source src="{{ .Video.LiveUrl.HLS }}" type='application/x-mpegURL' />
