@@ -48,6 +48,7 @@ func (v *Videos) Create(video Video) (*Video, error) {
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
 	video.Id = bson.NewObjectId()
+	video.StreamId = stream.Id
 	video.StreamKey = stream.StreamKey
 	video.PushUrl = stream.PushUrl
 	video.LiveUrl.HLS = stream.LiveUrl.HLS

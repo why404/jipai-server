@@ -15,7 +15,14 @@ type Mac struct {
 }
 
 func (m *Mac) newRequest(method, urlStr string, body *bytes.Buffer) (*http.Request, error) {
-	req, err := http.NewRequest(method, v1+urlStr, body)
+	fmt.Println("req:", method, urlStr, body.String())
+	var req *http.Request
+	var err error
+	if body == nil {
+		req, err = http.NewRequest(method, v1+urlStr, nil)
+	} else {
+		req, err = http.NewRequest(method, v1+urlStr, body)
+	}
 	if err != nil {
 		return nil, err
 	}

@@ -30,7 +30,7 @@ func (e Error) Error() string {
 
 func handleResp(resp *http.Response, reply interface{}) error {
 	decoder := json.NewDecoder(resp.Body)
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode/100 != 2 {
 		e := new(Error)
 		if err := decoder.Decode(e); err != nil {
 			return err
