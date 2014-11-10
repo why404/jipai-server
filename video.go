@@ -5,6 +5,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"net/http"
+	"time"
 )
 
 type Video struct {
@@ -18,6 +19,7 @@ type Video struct {
 		HLS  string `bson:"hls" json:"HLS"`
 		RTMP string `bson:"rtmp" json:"RTMP"`
 	} `bson:"live_url" json:"live_url"`
+	CreatedAt time.Time `bson:"created_at" json:"created_at"`
 }
 
 type Videos struct {
@@ -50,6 +52,7 @@ func (v *Videos) Create(video Video) (*Video, error) {
 	video.PushUrl = stream.PushUrl
 	video.LiveUrl.HLS = stream.LiveUrl.HLS
 	video.LiveUrl.RTMP = stream.LiveUrl.RTMP
+	video.CreatedAt = time.Now().UTC()
 	if err := v.collection.Insert(video); err != nil {
 		v.callback.OnError(err)
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
@@ -64,6 +67,10 @@ func (v *Videos) List() ([]Video, error) {
 		v.callback.OnError(err)
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
+	for i := range ret {
+		ret[i].PushUrl = ""
+		ret[i].CreatedAt = ret[i].CreatedAt.UTC()
+	}
 	return ret, nil
 }
 
@@ -76,6 +83,8 @@ func (v *Videos) Get(id string) (*Video, error) {
 		v.callback.OnError(err)
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
+	video.PushUrl = ""
+	video.CreatedAt = video.CreatedAt.UTC()
 	return &video, nil
 }
 
