@@ -112,9 +112,9 @@ func (v *Videos) GetPushUrl(id string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	stream := pili.Stream{
-		PushUrl:   video.PushUrl,
-		StreamKey: video.StreamKey,
+	stream, err := v.stream.Get(video.StreamId)
+	if err != nil {
+		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
 	ret := struct {
 		Url string `json:"push_url"`
