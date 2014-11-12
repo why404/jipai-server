@@ -62,7 +62,6 @@ a { color: #fff; }
 
 #content{
   display: none;
-  width: 100%;
   position: relative;
   z-index: 9999;
 }
