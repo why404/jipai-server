@@ -40,8 +40,11 @@ $(function(){
 
     $('body').on('click', '#player-button', function(){
       $('#content').show();
+      initializeVideoPlayerSize();
       window.player.play();
       window.player.requestFullscreen();
+      $('#soundwave').hide();
+      $('#player-button').hide();
     });
 
     var drawWave = function(){
