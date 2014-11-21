@@ -1,8 +1,8 @@
 {
     "mdb": "localhost",
     "listen_addr": ":5000",
-    "ak": "x5PTzM4gEy-vqaEicIwDIEdakkOffL7iHptSHFID",
-    "sk": "WJ82-ye5UC8Sa8vEkdH5yAs6XIgZlnoTMe9qWnCU",
+    "ak": "9WYbJLbbeiOfO3ajB2xx02cshU5MJZ61SL72AN9m",
+    "sk": "FYwiyvlG7d5ge3XBO5LkPyM80wU9NNFThNJD8u-q",
     "assets": "/jipai/assets",
     "templates": "/jipai/templates"
 }
