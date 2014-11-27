@@ -1,5 +1,5 @@
 {
-    "mdb": "localhost",
+    "mdb": "localhost/jipai",
     "listen_addr": ":5000",
     "ak": "9WYbJLbbeiOfO3ajB2xx02cshU5MJZ61SL72AN9m",
     "sk": "FYwiyvlG7d5ge3XBO5LkPyM80wU9NNFThNJD8u-q",

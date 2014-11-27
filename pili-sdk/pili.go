@@ -14,17 +14,14 @@ import (
 const v1 = "http://api.pili.qiniu.com/v1"
 
 type Stream struct {
-	Id            string `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	IsPrivate     bool   `json:"is_private"`
-	StreamKey     string `json:"stream_key,omitempty"`
-	StoragePeriod int    `json:"storage_period,omitempty"`
-	Protocol      string `json:"protocol,omitempty"`
-	PushUrl       string `json:"push_url,omitempty"`
-	LiveUrl       struct {
-		HLS  string `json:"HLS,omitempty"`
-		RTMP string `json:"RTMP,omitempty"`
-	} `json:"live_url,omitempty"`
+	Id            string            `json:"id,omitempty"`
+	Name          string            `json:"name,omitempty"`
+	IsPrivate     bool              `json:"is_private"`
+	StreamKey     string            `json:"stream_key,omitempty"`
+	StoragePeriod int               `json:"storage_period,omitempty"`
+	Protocol      string            `json:"protocol,omitempty"`
+	PushUrl       string            `json:"push_url,omitempty"`
+	LiveUrl       map[string]string `json:"live_url,omitempty"`
 
 	nonce int
 }

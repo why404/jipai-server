@@ -5,12 +5,12 @@ import (
 	"github.com/googollee/go-middleware/bind"
 	"github.com/googollee/go-middleware/routermiddle"
 	"github.com/julienschmidt/httprouter"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"text/template"
 )
 
 func main() {
@@ -56,8 +56,12 @@ func main() {
 		}
 		data := struct {
 			Video *Video
+			RTMP  bool
 		}{}
 		data.Video = video
+		if _, ok := r.URL.Query()["rtmp"]; ok {
+			data.RTMP = true
+		}
 		if err := templ.ExecuteTemplate(w, "player.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

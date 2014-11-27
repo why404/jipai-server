@@ -9,17 +9,14 @@ import (
 )
 
 type Video struct {
-	Id          bson.ObjectId `bson:"_id" json:"id"`
-	StreamId    string        `bson:"stream_id" json:"-"`
-	Name        string        `bson:"name" json:"name"`
-	Description string        `bson:"description" json:"description"`
-	StreamKey   string        `bson:"stream_key" json:"-"`
-	PushUrl     string        `bson:"push_url" json:"push_url,omitempty"`
-	LiveUrl     struct {
-		HLS  string `bson:"hls" json:"HLS"`
-		RTMP string `bson:"rtmp" json:"RTMP"`
-	} `bson:"live_url" json:"live_url"`
-	CreatedAt time.Time `bson:"created_at" json:"created_at"`
+	Id          bson.ObjectId     `bson:"_id" json:"id"`
+	StreamId    string            `bson:"stream_id" json:"-"`
+	Name        string            `bson:"name" json:"name"`
+	Description string            `bson:"description" json:"description"`
+	StreamKey   string            `bson:"stream_key" json:"-"`
+	PushUrl     string            `bson:"push_url" json:"push_url,omitempty"`
+	LiveUrl     map[string]string `bson:"live_url" json:"live_url"`
+	CreatedAt   time.Time         `bson:"created_at" json:"created_at"`
 }
 
 type Videos struct {
@@ -51,8 +48,7 @@ func (v *Videos) Create(video Video) (*Video, error) {
 	video.StreamId = stream.Id
 	video.StreamKey = stream.StreamKey
 	video.PushUrl = stream.PushUrl
-	video.LiveUrl.HLS = stream.LiveUrl.HLS
-	video.LiveUrl.RTMP = stream.LiveUrl.RTMP
+	video.LiveUrl = stream.LiveUrl
 	video.CreatedAt = time.Now().UTC()
 	if err := v.collection.Insert(video); err != nil {
 		v.callback.OnError(err)
