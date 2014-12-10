@@ -1,4 +1,4 @@
-FROM golang:1.3.3
+FROM golang:latest
 
 RUN go get github.com/braintree/manners
 RUN go get github.com/googollee/go-middleware

@@ -23,7 +23,7 @@ func main() {
 		log.Fatal("template error:", err)
 	}
 
-	videos, err := NewVideos(conf.mdb, conf.Ak, conf.Sk, conf)
+	videos, err := NewVideos(conf.mdb, conf.App, conf.Ak, conf.Sk, conf)
 	if err != nil {
 		log.Fatal("create videos error:", err)
 	}

@@ -2,42 +2,28 @@ package pili
 
 import (
 	"bytes"
-	"crypto/hmac"
-	"crypto/sha1"
-	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 )
 
 const v1 = "http://api.pili.qiniu.com/v1"
 
+type StreamUrl map[string]string
+
+const StreamDefaultLive = "[original]"
+
 type Stream struct {
-	Id            string            `json:"id,omitempty"`
-	Name          string            `json:"name,omitempty"`
-	IsPrivate     bool              `json:"is_private"`
-	StreamKey     string            `json:"stream_key,omitempty"`
-	StoragePeriod int               `json:"storage_period,omitempty"`
-	Protocol      string            `json:"protocol,omitempty"`
-	PushUrl       string            `json:"push_url,omitempty"`
-	LiveUrl       map[string]string `json:"live_url,omitempty"`
-
-	nonce int
-}
-
-func (s *Stream) SignPushUrl() string {
-	if s.nonce == 0 {
-		s.nonce = int(time.Now().Unix())
-	} else {
-		s.nonce++
-	}
-	ret := fmt.Sprintf("%s?nonce=%d", s.PushUrl, s.nonce)
-	hash := hmac.New(sha1.New, []byte(s.StreamKey))
-	hash.Write([]byte(ret))
-	token := base64.URLEncoding.EncodeToString(hash.Sum(nil))
-	ret = fmt.Sprintf("%s&token=%s", ret, token)
-	return ret
+	ID           string               `bson:"_id" json:"id"`
+	CreatedAt    time.Time            `bson:"created_at" json:"created_at"`
+	UpdatedAt    time.Time            `bson:"updated_at" json:"updated_at"`
+	Application  string               `bson:"application" json:"application"`
+	IsPrivate    bool                 `bson:"is_private" json:"is_private"`
+	StreamKey    string               `bson:"stream_key" json:"stream_key"`
+	PushNonce    int64                `bson:"push_nonce" json:"-"`
+	PushUrl      []StreamUrl          `bson:"push_url" json:"push_url"`
+	LiveUrl      map[string]StreamUrl `bson:"live_url" json:"live_url"`
+	LivestreamId string               `bson:"livestream_id" json:"-"`
 }
 
 type Streams struct {
@@ -52,17 +38,17 @@ func New(mac Mac) *Streams {
 	}
 }
 
-func (s *Streams) Create(name, protocol, streamKey string, isPrivate bool, storagePeriod int) (*Stream, error) {
-	stream := Stream{
-		Name:          name,
-		IsPrivate:     isPrivate,
-		Protocol:      protocol,
-		StreamKey:     streamKey,
-		StoragePeriod: storagePeriod,
+func (s *Streams) Create(app, streamKey string, isPrivate bool) (*Stream, error) {
+	args := map[string]interface{}{
+		"application": app,
+		"is_private":  isPrivate,
+	}
+	if streamKey != "" {
+		args["stream_key"] = streamKey
 	}
 	body := bytes.NewBuffer(nil)
 	encoder := json.NewEncoder(body)
-	if err := encoder.Encode(stream); err != nil {
+	if err := encoder.Encode(args); err != nil {
 		return nil, err
 	}
 	req, err := s.mac.newRequest("POST", "/streams", body)
@@ -75,6 +61,7 @@ func (s *Streams) Create(name, protocol, streamKey string, isPrivate bool, stora
 	}
 	defer resp.Body.Close()
 
+	var stream Stream
 	if err := handleResp(resp, &stream); err != nil {
 		return nil, err
 	}

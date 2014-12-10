@@ -1,6 +1,10 @@
 package main
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
 	"jipai/pili-sdk"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -9,7 +13,7 @@ import (
 )
 
 type Video struct {
-	Id          bson.ObjectId     `bson:"_id" json:"id"`
+	ID          bson.ObjectId     `bson:"_id" json:"id"`
 	StreamId    string            `bson:"stream_id" json:"-"`
 	Name        string            `bson:"name" json:"name"`
 	Description string            `bson:"description" json:"description"`
@@ -17,15 +21,32 @@ type Video struct {
 	PushUrl     string            `bson:"push_url" json:"push_url,omitempty"`
 	LiveUrl     map[string]string `bson:"live_url" json:"live_url"`
 	CreatedAt   time.Time         `bson:"created_at" json:"created_at"`
+
+	nonce int
+}
+
+func (v *Video) SignPushUrl() string {
+	if v.nonce == 0 {
+		v.nonce = int(time.Now().Unix())
+	} else {
+		v.nonce++
+	}
+	ret := fmt.Sprintf("%s?nonce=%d", v.PushUrl, v.nonce)
+	hash := hmac.New(sha1.New, []byte(v.StreamKey))
+	hash.Write([]byte(ret))
+	token := base64.URLEncoding.EncodeToString(hash.Sum(nil))
+	ret = fmt.Sprintf("%s&token=%v", ret, token)
+	return ret
 }
 
 type Videos struct {
 	collection *mgo.Collection
+	app        string
 	stream     *pili.Streams
 	callback   ErrorCallback
 }
 
-func NewVideos(mdb *mgo.Database, ak, sk string, callback ErrorCallback) (*Videos, error) {
+func NewVideos(mdb *mgo.Database, app, ak, sk string, callback ErrorCallback) (*Videos, error) {
 	collection := mdb.C("videos")
 	mac := pili.Mac{
 		AccessKey: ak,
@@ -34,27 +55,28 @@ func NewVideos(mdb *mgo.Database, ak, sk string, callback ErrorCallback) (*Video
 	stream := pili.New(mac)
 	return &Videos{
 		collection: collection,
+		app:        app,
 		stream:     stream,
 		callback:   callback,
 	}, nil
 }
 
 func (v *Videos) Create(video Video) (*Video, error) {
-	stream, err := v.stream.Create(video.Name, "RTMP", "", false, 0)
+	stream, err := v.stream.Create(v.app, "", false)
 	if err != nil {
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
-	video.Id = bson.NewObjectId()
-	video.StreamId = stream.Id
+	video.ID = bson.NewObjectId()
+	video.StreamId = stream.ID
 	video.StreamKey = stream.StreamKey
-	video.PushUrl = stream.PushUrl
-	video.LiveUrl = stream.LiveUrl
+	video.PushUrl = stream.PushUrl[0]["RTMP"]
+	video.LiveUrl = stream.LiveUrl[pili.StreamDefaultLive]
 	video.CreatedAt = time.Now().UTC()
 	if err := v.collection.Insert(video); err != nil {
 		v.callback.OnError(err)
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
-	video.PushUrl = stream.SignPushUrl()
+	video.PushUrl = video.SignPushUrl()
 	return &video, nil
 }
 
@@ -66,7 +88,6 @@ func (v *Videos) List() ([]Video, error) {
 	}
 	for i := range ret {
 		ret[i].PushUrl = ""
-		ret[i].CreatedAt = ret[i].CreatedAt.UTC()
 	}
 	return ret, nil
 }
@@ -81,7 +102,6 @@ func (v *Videos) Get(id string) (*Video, error) {
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
 	video.PushUrl = ""
-	video.CreatedAt = video.CreatedAt.UTC()
 	return &video, nil
 }
 
@@ -108,13 +128,9 @@ func (v *Videos) GetPushUrl(id string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	stream, err := v.stream.Get(video.StreamId)
-	if err != nil {
-		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
-	}
 	ret := struct {
 		Url string `json:"push_url"`
 	}{}
-	ret.Url = stream.SignPushUrl()
+	ret.Url = video.SignPushUrl()
 	return ret, nil
 }

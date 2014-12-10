@@ -16,6 +16,7 @@ type ErrorCallback interface {
 type Config struct {
 	Mdb        string   `json:"mdb"`
 	ListenAddr string   `json:"listen_addr"`
+	App        string   `json:"app"`
 	Ak         string   `json:"ak"`
 	Sk         string   `json:"sk"`
 	Assets     http.Dir `json:"assets"`

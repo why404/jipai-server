@@ -1,8 +1,9 @@
 {
     "mdb": "localhost/jipai",
     "listen_addr": ":5000",
-    "ak": "9WYbJLbbeiOfO3ajB2xx02cshU5MJZ61SL72AN9m",
-    "sk": "FYwiyvlG7d5ge3XBO5LkPyM80wU9NNFThNJD8u-q",
+    "app": "jipai",
+    "ak": "_29LfBrOeVbwVke9e682us0uZnmLZEd-mg76TWuMWgA=",
+    "sk": "M8cpSe88q4udnPDQ6BQegMTCJl0NYEUev6Meki0yHwFPyugc7fZ5QufrdotY2g1cJ8ilpz3G-EUEyT2aaUHAXg==",
     "assets": "/jipai/assets",
     "templates": "/jipai/templates"
 }
