@@ -9,6 +9,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -18,7 +19,7 @@ type Video struct {
 	Name        string            `bson:"name" json:"name"`
 	Description string            `bson:"description" json:"description"`
 	StreamKey   string            `bson:"stream_key" json:"-"`
-	PushUrl     string            `bson:"push_url" json:"push_url,omitempty"`
+	PushUrl     string            `bson:"push_url" json:"push_url"`
 	LiveUrl     map[string]string `bson:"live_url" json:"live_url"`
 	CreatedAt   time.Time         `bson:"created_at" json:"created_at"`
 
@@ -101,7 +102,11 @@ func (v *Videos) Get(id string) (*Video, error) {
 		v.callback.OnError(err)
 		return nil, Error{http.StatusInternalServerError, err.Error(), 500001}
 	}
-	video.PushUrl = ""
+	u, err := url.Parse(video.LiveUrl["RTMP"])
+	if err == nil {
+		u.Host = "ws1.src.rtmp.pili.qiniu.com"
+		video.LiveUrl["RTMP"] = u.String()
+	}
 	return &video, nil
 }
 
