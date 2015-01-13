@@ -26,9 +26,6 @@ $(function(){
   // player page
   if($('.player-page').size()){
 
-    // videojs.options.flash.swf = "http://pili-static.qiniudn.com/video.js/4.8.4/video-js.swf"
-    window.player = videojs('video');
-
     var initializeVideoPlayerSize = function(){
       var $playerWrap = $('#player-wrap');
           $playerWrap.height($playerWrap.width() * 9 / 16)
@@ -38,14 +35,52 @@ $(function(){
 
     $(window).bind('resize', initializeVideoPlayerSize);
 
+
     $('body').on('click', '#player-button', function(){
       $('#content').show();
       initializeVideoPlayerSize();
-      window.player.play();
-      window.player.requestFullscreen();
+
+      var $videoSource = $('#video source');
+
+      if( $videoSource.attr('type') == "rtmp/mp4" ){
+        SewisePlayer.setup({
+          server: "live",
+          type: "rtmp",
+          buffer: 1,
+          streamurl: $videoSource.attr('src'),
+          autostart: "true",
+          skin: "liveWhite",
+          claritybutton: "disable",
+          timedisplay: "disable",
+          topBarDisplay: "disable",
+          playerName: "Jipai Player",
+          copyright: "(C) All right reserved the Jipai.in",
+          logo: "/assets/images/headline.png"
+        }, "player-wrap");
+
+      }else{
+
+        SewisePlayer.setup({
+          server: "vod",
+          type: "m3u8",
+          videourl: $videoSource.attr('src'),
+          autostart: "true",
+          skin: "vodWhite",
+          claritybutton: "disable",
+          timedisplay: "disable",
+          topBarDisplay: "disable",
+          playerName: "Jipai Player",
+          copyright: "(C) All right reserved the Jipai.in",
+          lang: "zh_CN",
+          logo: "/assets/images/headline.png"
+        }, "player-wrap");
+
+      }
+
       $('#soundwave').hide();
       $('#player-button').hide();
     });
+
 
     var drawWave = function(){
       if (window.SW) {

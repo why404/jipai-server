@@ -65,6 +65,9 @@ a { color: #fff; }
   position: relative;
   z-index: 9999;
 }
+#player-wrap .logo{ background-image: none;}
+
+#video{ display: none;}
 
 #title{ position: relative; z-index: 9999;}
 .page-header{ color: #171717; font-size: 1.5em; border: none;}
