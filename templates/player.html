@@ -33,11 +33,9 @@
       <div id="player-wrap">
         <video id="video" controls preload="none" width="100%" height="100%">
           {{ if .RTMP }}
-          <!-- <source src="{{ index .Video.LiveUrl "RTMP" }}" type='rtmp/mp4' /> -->
-          <!-- <source src="rtmp://ws1.src.rtmp.pili.qiniu.com/livestream/3qqfd5hg" type='rtmp/mp4' /> -->
+          <source src="{{ index .Video.LiveUrl "RTMP" }}" type='rtmp/mp4' />
           {{ else }}
-          <!-- <source src="{{ index .Video.LiveUrl "HLS" }}" type='application/x-mpegURL' /> -->
-          <source src="http://m3u8.pili.clouddn.com/api/hls/3qqfd5hg.m3u8" type='application/x-mpegURL' />
+          <source src="{{ index .Video.LiveUrl "HLS" }}" type='application/x-mpegURL' />
           {{ end }}
         </video>
       </div>
