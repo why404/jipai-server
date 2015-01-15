@@ -15,7 +15,6 @@
 
     <script type="text/javascript" src="http://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdn.staticfile.org/flexslider/2.2.2/jquery.flexslider-min.js"></script>
-    <script type="text/javascript" src="/assets/js/app.js"></script>
 
   </head>
   <body class="home-page">
@@ -47,6 +46,30 @@
       </div>
       <div id="phone"></div>
     </div>
+
+    <script type="text/javascript">
+      $(window).load(function() {
+
+        if($('.home-page').size()){
+          // The slider being synced must be initialized first
+          $('#carousel').flexslider({
+            animation: "fade",
+            controlNav: false,
+            directionNav: false,
+            animationLoop: true,
+            asNavFor: '#slider'
+          });
+
+          $('#slider').flexslider({
+            animation: "fade",
+            controlNav: false,
+            directionNav: false,
+            animationLoop: true,
+            sync: "#carousel"
+          });
+        }
+      });
+    </script>
 
   </body>
 </html>
